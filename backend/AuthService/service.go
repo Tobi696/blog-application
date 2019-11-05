@@ -34,9 +34,7 @@ func (authServer) Login(_ context.Context, in *proto.LoginRequest) (*proto.AuthR
 	return &proto.AuthResponse{Token: user.GetToken()}, nil
 }
 
-var server authServer
-
-func (authServer) Signup(_ context.Context, in *proto.SignupRequest) (*proto.AuthResponse, error) {
+func (server authServer) Signup(_ context.Context, in *proto.SignupRequest) (*proto.AuthResponse, error) {
 	username, email, password := in.GetUsername(), in.GetEmail(), in.GetPassword()
 	match, _ := regexp.MatchString("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", email)
 	if len(username) < 4 || len(username) > 20 || len(email) < 7 || len(email) > 35 || len(password) < 8 || len(password) > 128 || !match {
@@ -91,6 +89,12 @@ func (authServer) EmailUsed(_ context.Context, in *proto.EmailUsedRequest) (*pro
 	var result global.User
 	global.DB.Collection("user").FindOne(ctx, bson.M{"email": email}).Decode(&result)
 	return &proto.UsedResponse{Used: result != global.NilUser}, nil
+}
+
+func (authServer) AuthUser(_ context.Context, in *proto.AuthUserRequest) (*proto.AuthUserResponse, error) {
+	token := in.GetToken()
+	user := global.UserFromToken(token)
+	return &proto.AuthUserResponse{ID: user.ID.Hex(), Username: user.Username, Email: user.Email}, nil
 }
 
 func main() {
