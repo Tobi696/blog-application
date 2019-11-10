@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+* {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+div.login-div {
+  margin: 20px auto;
+  padding: 30px;
+  text-align: center;
+  background: #e8e8e8;
+  width: 95%;
+  max-width: 400px;
+  border-radius: 12px;
+}
+div.login-div input {
+  padding: 5px;
+  margin: 10px;
+  border-radius: 4px;
+  border: none;
+}
+div.login-div input:focus {
+  outline: none;
+  border: 2px solid rgba(25, 174, 255, 0.4);
+}
+div.login-div label.input-label {
+  display: block;
+  margin-top: 20px;
+}
+div.login-div button {
+  cursor: pointer;
+  padding: 5px 35px;
+  margin: 10px auto;
+  display: block;
+  border: none;
+  border-radius: 5px;
+  background-color: #1957ff;
+  color: white;
+  font-size: 14pt;
+}
+
+/*# sourceMappingURL=/app.55bab2ff.css.map */
