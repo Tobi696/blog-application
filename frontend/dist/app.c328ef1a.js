@@ -122,7 +122,59 @@ var define;
 !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):e.Navigo=t()}(this,function(){"use strict";var e="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};function t(){return!("undefined"==typeof window||!window.history||!window.history.pushState)}function n(e,n,o){this.root=null,this._routes=[],this._useHash=n,this._hash=void 0===o?"#":o,this._paused=!1,this._destroyed=!1,this._lastRouteResolved=null,this._notFoundHandler=null,this._defaultHandler=null,this._usePushState=!n&&t(),this._onLocationChange=this._onLocationChange.bind(this),this._genericHooks=null,this._historyAPIUpdateMethod="pushState",e?this.root=n?e.replace(/\/$/,"/"+this._hash):e.replace(/\/$/,""):n&&(this.root=this._cLoc().split(this._hash)[0].replace(/\/$/,"/"+this._hash)),this._listen(),this.updatePageLinks()}function o(e){return e instanceof RegExp?e:e.replace(/\/+$/,"").replace(/^\/+/,"^/")}function i(e){return e.replace(/\/$/,"").split("/").length}function s(e,t){return i(t)-i(e)}function r(e,t){return function(e){return(arguments.length>1&&void 0!==arguments[1]?arguments[1]:[]).map(function(t){var i=function(e){var t=[];return{regexp:e instanceof RegExp?e:new RegExp(e.replace(n.PARAMETER_REGEXP,function(e,o,i){return t.push(i),n.REPLACE_VARIABLE_REGEXP}).replace(n.WILDCARD_REGEXP,n.REPLACE_WILDCARD)+n.FOLLOWED_BY_SLASH_REGEXP,n.MATCH_REGEXP_FLAGS),paramNames:t}}(o(t.route)),s=i.regexp,r=i.paramNames,a=e.replace(/^\/+/,"/").match(s),h=function(e,t){return 0===t.length?null:e?e.slice(1,e.length).reduce(function(e,n,o){return null===e&&(e={}),e[t[o]]=decodeURIComponent(n),e},null):null}(a,r);return!!a&&{match:a,route:t,params:h}}).filter(function(e){return e})}(e,t)[0]||!1}function a(e,t){var n=t.map(function(t){return""===t.route||"*"===t.route?e:e.split(new RegExp(t.route+"($|/)"))[0]}),i=o(e);return n.length>1?n.reduce(function(e,t){return e.length>t.length&&(e=t),e},n[0]):1===n.length?n[0]:i}function h(e,n,o){var i,s=function(e){return e.split(/\?(.*)?$/)[0]};return void 0===o&&(o="#"),t()&&!n?s(e).split(o)[0]:(i=e.split(o)).length>1?s(i[1]):s(i[0])}function u(t,n,o){if(n&&"object"===(void 0===n?"undefined":e(n))){if(n.before)return void n.before(function(){(!(arguments.length>0&&void 0!==arguments[0])||arguments[0])&&(t(),n.after&&n.after(o))},o);if(n.after)return t(),void(n.after&&n.after(o))}t()}return n.prototype={helpers:{match:r,root:a,clean:o,getOnlyURL:h},navigate:function(e,t){var n;return e=e||"",this._usePushState?(n=(n=(t?"":this._getRoot()+"/")+e.replace(/^\/+/,"/")).replace(/([^:])(\/{2,})/g,"$1/"),history[this._historyAPIUpdateMethod]({},"",n),this.resolve()):"undefined"!=typeof window&&(e=e.replace(new RegExp("^"+this._hash),""),window.location.href=window.location.href.replace(/#$/,"").replace(new RegExp(this._hash+".*$"),"")+this._hash+e),this},on:function(){for(var t=this,n=arguments.length,o=Array(n),i=0;i<n;i++)o[i]=arguments[i];if("function"==typeof o[0])this._defaultHandler={handler:o[0],hooks:o[1]};else if(o.length>=2)if("/"===o[0]){var r=o[1];"object"===e(o[1])&&(r=o[1].uses),this._defaultHandler={handler:r,hooks:o[2]}}else this._add(o[0],o[1],o[2]);else"object"===e(o[0])&&Object.keys(o[0]).sort(s).forEach(function(e){t.on(e,o[0][e])});return this},off:function(e){return null!==this._defaultHandler&&e===this._defaultHandler.handler?this._defaultHandler=null:null!==this._notFoundHandler&&e===this._notFoundHandler.handler&&(this._notFoundHandler=null),this._routes=this._routes.reduce(function(t,n){return n.handler!==e&&t.push(n),t},[]),this},notFound:function(e,t){return this._notFoundHandler={handler:e,hooks:t},this},resolve:function(e){var n,o,i=this,s=(e||this._cLoc()).replace(this._getRoot(),"");this._useHash&&(s=s.replace(new RegExp("^/"+this._hash),"/"));var a=function(e){return e.split(/\?(.*)?$/).slice(1).join("")}(e||this._cLoc()),l=h(s,this._useHash,this._hash);return!this._paused&&(this._lastRouteResolved&&l===this._lastRouteResolved.url&&a===this._lastRouteResolved.query?(this._lastRouteResolved.hooks&&this._lastRouteResolved.hooks.already&&this._lastRouteResolved.hooks.already(this._lastRouteResolved.params),!1):(o=r(l,this._routes))?(this._callLeave(),this._lastRouteResolved={url:l,query:a,hooks:o.route.hooks,params:o.params,name:o.route.name},n=o.route.handler,u(function(){u(function(){o.route.route instanceof RegExp?n.apply(void 0,o.match.slice(1,o.match.length)):n(o.params,a)},o.route.hooks,o.params,i._genericHooks)},this._genericHooks,o.params),o):this._defaultHandler&&(""===l||"/"===l||l===this._hash||function(e,n,o){if(t()&&!n)return!1;if(!e.match(o))return!1;var i=e.split(o);return i.length<2||""===i[1]}(l,this._useHash,this._hash))?(u(function(){u(function(){i._callLeave(),i._lastRouteResolved={url:l,query:a,hooks:i._defaultHandler.hooks},i._defaultHandler.handler(a)},i._defaultHandler.hooks)},this._genericHooks),!0):(this._notFoundHandler&&u(function(){u(function(){i._callLeave(),i._lastRouteResolved={url:l,query:a,hooks:i._notFoundHandler.hooks},i._notFoundHandler.handler(a)},i._notFoundHandler.hooks)},this._genericHooks),!1))},destroy:function(){this._routes=[],this._destroyed=!0,this._lastRouteResolved=null,this._genericHooks=null,clearTimeout(this._listeningInterval),"undefined"!=typeof window&&(window.removeEventListener("popstate",this._onLocationChange),window.removeEventListener("hashchange",this._onLocationChange))},updatePageLinks:function(){var e=this;"undefined"!=typeof document&&this._findLinks().forEach(function(t){t.hasListenerAttached||(t.addEventListener("click",function(n){if((n.ctrlKey||n.metaKey)&&"a"==n.target.tagName.toLowerCase())return!1;var o=e.getLinkPath(t);e._destroyed||(n.preventDefault(),e.navigate(o.replace(/\/+$/,"").replace(/^\/+/,"/")))}),t.hasListenerAttached=!0)})},generate:function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},n=this._routes.reduce(function(n,o){var i;if(o.name===e)for(i in n=o.route,t)n=n.toString().replace(":"+i,t[i]);return n},"");return this._useHash?this._hash+n:n},link:function(e){return this._getRoot()+e},pause:function(){var e=!(arguments.length>0&&void 0!==arguments[0])||arguments[0];this._paused=e,this._historyAPIUpdateMethod=e?"replaceState":"pushState"},resume:function(){this.pause(!1)},historyAPIUpdateMethod:function(e){return void 0===e?this._historyAPIUpdateMethod:(this._historyAPIUpdateMethod=e,e)},disableIfAPINotAvailable:function(){t()||this.destroy()},lastRouteResolved:function(){return this._lastRouteResolved},getLinkPath:function(e){return e.getAttribute("href")},hooks:function(e){this._genericHooks=e},_add:function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null,o=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null;return"string"==typeof t&&(t=encodeURI(t)),this._routes.push("object"===(void 0===n?"undefined":e(n))?{route:t,handler:n.uses,name:n.as,hooks:o||n.hooks}:{route:t,handler:n,hooks:o}),this._add},_getRoot:function(){return null!==this.root?this.root:(this.root=a(this._cLoc().split("?")[0],this._routes),this.root)},_listen:function(){var e=this;if(this._usePushState)window.addEventListener("popstate",this._onLocationChange);else if("undefined"!=typeof window&&"onhashchange"in window)window.addEventListener("hashchange",this._onLocationChange);else{var t=this._cLoc(),n=void 0,o=void 0;(o=function(){n=e._cLoc(),t!==n&&(t=n,e.resolve()),e._listeningInterval=setTimeout(o,200)})()}},_cLoc:function(){return"undefined"!=typeof window?void 0!==window.__NAVIGO_WINDOW_LOCATION_MOCK__?window.__NAVIGO_WINDOW_LOCATION_MOCK__:o(window.location.href):""},_findLinks:function(){return[].slice.call(document.querySelectorAll("[data-navigo]"))},_onLocationChange:function(){this.resolve()},_callLeave:function(){var e=this._lastRouteResolved;e&&e.hooks&&e.hooks.leave&&e.hooks.leave(e.params)}},n.PARAMETER_REGEXP=/([:*])(\w+)/g,n.WILDCARD_REGEXP=/\*/g,n.REPLACE_VARIABLE_REGEXP="([^/]+)",n.REPLACE_WILDCARD="(?:.*)",n.FOLLOWED_BY_SLASH_REGEXP="(?:/$|$)",n.MATCH_REGEXP_FLAGS="",n});
 
 
-},{}],"node_modules/grpc-web/index.js":[function(require,module,exports) {
+},{}],"views/home.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Home = Home;
+
+var _app = require("../app");
+
+function Home() {
+  document.body.innerHTML = "";
+  var homeDiv = document.createElement("div");
+  homeDiv.classList.add("home-div");
+  var user = JSON.parse(localStorage.getItem("user"));
+
+  if (user == null) {
+    var buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+    var loginButton = document.createElement("button");
+    loginButton.innerText = "Login";
+    loginButton.addEventListener('click', function () {
+      _app.router.navigate("/login");
+    });
+    buttonContainer.appendChild(loginButton);
+    var text = document.createElement("h2");
+    text.innerText = "You are not authenticated.";
+    buttonContainer.appendChild(text);
+    var signupButton = document.createElement("button");
+    signupButton.innerText = "Sign Up";
+    signupButton.addEventListener('click', function () {
+      _app.router.navigate("/signup");
+    });
+    buttonContainer.appendChild(signupButton);
+    homeDiv.appendChild(buttonContainer);
+  } else {
+    var authText = document.createElement("div");
+    authText.classList.add("auth-text");
+    authText.innerText = "You're logged in as ".concat(user.username, " and your E-Mail is ").concat(user.email);
+    var logoutBtn = document.createElement("button");
+    logoutBtn.innerText = "Logout";
+    logoutBtn.addEventListener('click', function () {
+      localStorage.setItem("user", "null");
+      localStorage.setItem("token", "null");
+      Home();
+    });
+    authText.appendChild(logoutBtn);
+    homeDiv.appendChild(authText);
+  }
+
+  document.body.appendChild(homeDiv);
+}
+},{"../app":"app.js"}],"node_modules/grpc-web/index.js":[function(require,module,exports) {
 var global = arguments[3];
 var aa="function"==typeof Object.defineProperties?Object.defineProperty:function(a,b,c){a!=Array.prototype&&a!=Object.prototype&&(a[b]=c.value)},ba="undefined"!=typeof window&&window===this?this:"undefined"!=typeof global&&null!=global?global:this;function ca(a,b){if(b){var c=ba;a=a.split(".");for(var d=0;d<a.length-1;d++){var e=a[d];e in c||(c[e]={});c=c[e]}a=a[a.length-1];d=c[a];b=b(d);b!=d&&null!=b&&aa(c,a,{configurable:!0,writable:!0,value:b})}}
 function da(a){var b=0;return function(){return b<a.length?{done:!1,value:a[b++]}:{done:!0}}}function ea(a){var b="undefined"!=typeof Symbol&&Symbol.iterator&&a[Symbol.iterator];return b?b.call(a):{next:da(a)}}
@@ -4570,59 +4622,19 @@ proto.proto.AuthServicePromiseClient.prototype.authUser = function (request, met
 };
 
 module.exports = proto.proto;
-},{"grpc-web":"node_modules/grpc-web/index.js","./services_pb.js":"proto/services_pb.js"}],"app.js":[function(require,module,exports) {
+},{"grpc-web":"node_modules/grpc-web/index.js","./services_pb.js":"proto/services_pb.js"}],"views/login.js":[function(require,module,exports) {
 "use strict";
 
-var _navigo = _interopRequireDefault(require("navigo"));
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Login = Login;
 
-var _services_grpc_web_pb = require("./proto/services_grpc_web_pb");
+var _app = require("../app");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _services_grpc_web_pb = require("../proto/services_grpc_web_pb");
 
-var router = new _navigo.default();
-var authClient = new _services_grpc_web_pb.AuthServiceClient('http://localhost:9001');
-router.on("/", function () {
-  document.body.innerHTML = "";
-  var homeDiv = document.createElement("div");
-  homeDiv.classList.add("home-div");
-  var user = JSON.parse(localStorage.getItem("user"));
-
-  if (user == null) {
-    var buttonContainer = document.createElement("div");
-    buttonContainer.classList.add("button-container");
-    var loginButton = document.createElement("button");
-    loginButton.innerText = "Login";
-    loginButton.addEventListener('click', function () {
-      router.navigate("/login");
-    });
-    buttonContainer.appendChild(loginButton);
-    var text = document.createElement("h2");
-    text.innerText = "You are not authenticated.";
-    buttonContainer.appendChild(text);
-    var signupButton = document.createElement("button");
-    signupButton.innerText = "Sign Up";
-    signupButton.addEventListener('click', function () {
-      router.navigate("/signup");
-    });
-    buttonContainer.appendChild(signupButton);
-    homeDiv.appendChild(buttonContainer);
-  } else {
-    var authText = document.createElement("div");
-    authText.classList.add("auth-text");
-    authText.innerText = "You're logged in as ".concat(user.username, " and your E-Mail is ").concat(user.email);
-    var logoutBtn = document.createElement("button");
-    logoutBtn.innerText = "Logout";
-    logoutBtn.addEventListener('click', function () {
-      localStorage.setItem("user", "null");
-      localStorage.setItem("token", "null");
-      window.location.reload();
-    });
-    authText.appendChild(logoutBtn);
-    homeDiv.appendChild(authText);
-  }
-
-  document.body.appendChild(homeDiv);
-}).on("/login", function () {
+function Login() {
   document.body.innerHTML = "";
   var loginDiv = document.createElement('div');
   loginDiv.classList.add("authentication-div");
@@ -4659,7 +4671,8 @@ router.on("/", function () {
     var req = new _services_grpc_web_pb.LoginRequest();
     req.setLogin(loginInput.value);
     req.setPassword(passwordInput.value);
-    authClient.login(req, {}, function (err, res) {
+
+    _app.authClient.login(req, {}, function (err, res) {
       if (i != 0) return;
       ++i;
       if (err) return alert(err.message);
@@ -4667,7 +4680,8 @@ router.on("/", function () {
       req = new _services_grpc_web_pb.AuthUserRequest();
       req.setToken(res.getToken());
       var j = 0;
-      authClient.authUser(req, {}, function (err, res) {
+
+      _app.authClient.authUser(req, {}, function (err, res) {
         if (j != 0) return;
         ++j;
         if (err) return alert(err.message);
@@ -4677,12 +4691,27 @@ router.on("/", function () {
           email: res.getEmail()
         };
         localStorage.setItem('user', JSON.stringify(user));
+
+        _app.router.navigate("/");
       });
     });
   });
   loginDiv.appendChild(loginForm);
   document.body.appendChild(loginDiv);
-}).on("/signup", function () {
+}
+},{"../app":"app.js","../proto/services_grpc_web_pb":"proto/services_grpc_web_pb.js"}],"views/signup.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Signup = Signup;
+
+var _app = require("../app");
+
+var _services_grpc_web_pb = require("../proto/services_grpc_web_pb");
+
+function Signup() {
   document.body.innerHTML = "";
   var signupDiv = document.createElement("div");
   signupDiv.classList.add("authentication-div");
@@ -4713,6 +4742,18 @@ router.on("/", function () {
       usernameError.innerText = "Username must not be longer than 20 characters.";
       return;
     }
+
+    var req = new _services_grpc_web_pb.UsernameUsedRequest();
+    req.setUsername(username);
+
+    _app.authClient.usernameUsed(req, {}, function (err, res) {
+      if (err) return alert(err.message);
+
+      if (res.getUsed()) {
+        usernameError.innerText = "This Username is already in use. Please choose another.";
+        return;
+      }
+    });
   });
   var usernameError = document.createElement("div");
   usernameError.id = "username-error";
@@ -4746,6 +4787,18 @@ router.on("/", function () {
       emailError.innerText = "Invalid E-Mail";
       return;
     }
+
+    var req = new _services_grpc_web_pb.EmailUsedRequest();
+    req.setEmail(email);
+
+    _app.authClient.emailUsed(req, {}, function (err, res) {
+      if (err) return alert(err.message);
+
+      if (res.getUsed()) {
+        emailError.innerText = "This E-Mail is already in use. Please choose another.";
+        return;
+      }
+    });
   });
   var emailError = document.createElement("div");
   emailError.id = "email-error";
@@ -4789,12 +4842,14 @@ router.on("/", function () {
     request.setUsername(usernameInput.value);
     request.setEmail(emailInput.value);
     request.setPassword(passwordInput.value);
-    authClient.signup(request, {}, function (err, res) {
+
+    _app.authClient.signup(request, {}, function (err, res) {
       if (err) return alert(err);
       localStorage.setItem('token', res.getToken());
       request = new _services_grpc_web_pb.AuthUserRequest();
       request.setToken(res.getToken());
-      authClient.authUser(request, {}, function (err, res) {
+
+      _app.authClient.authUser(request, {}, function (err, res) {
         if (err) return alert(err);
         var user = {
           id: res.getId(),
@@ -4802,13 +4857,40 @@ router.on("/", function () {
           email: res.getEmail()
         };
         localStorage.setItem("user", JSON.stringify(user));
+
+        _app.router.navigate("/");
       });
     });
   });
   signupDiv.appendChild(signupForm);
   document.body.appendChild(signupDiv);
-}).resolve();
-},{"navigo":"node_modules/navigo/lib/navigo.min.js","./proto/services_grpc_web_pb":"proto/services_grpc_web_pb.js"}],"C:/Users/Tobias/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+}
+},{"../app":"app.js","../proto/services_grpc_web_pb":"proto/services_grpc_web_pb.js"}],"app.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.authClient = exports.router = void 0;
+
+var _navigo = _interopRequireDefault(require("navigo"));
+
+var _home = require("./views/home");
+
+var _login = require("./views/login");
+
+var _signup = require("./views/signup");
+
+var _services_grpc_web_pb = require("./proto/services_grpc_web_pb");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var authClient = new _services_grpc_web_pb.AuthServiceClient("http://localhost:9001");
+exports.authClient = authClient;
+var router = new _navigo.default();
+exports.router = router;
+router.on("/", _home.Home).on("/login", _login.Login).on("/signup", _signup.Signup).resolve();
+},{"navigo":"node_modules/navigo/lib/navigo.min.js","./views/home":"views/home.js","./views/login":"views/login.js","./views/signup":"views/signup.js","./proto/services_grpc_web_pb":"proto/services_grpc_web_pb.js"}],"C:/Users/Tobias/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -4836,7 +4918,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65136" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58127" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
