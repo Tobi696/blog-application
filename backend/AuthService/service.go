@@ -24,9 +24,17 @@ import (
 
 type authServer struct{}
 
-var userCollection mongo.Collection
+var userCollection *mongo.Collection
+
+func getUserCollection() mongo.Collection {
+	if userCollection == nil {
+		userCollection = global.DB.Collection("user")
+	}
+	return *userCollection
+}
 
 func (authServer) Login(_ context.Context, in *proto.LoginRequest) (*proto.AuthResponse, error) {
+	userCollection := getUserCollection()
 	login, password := in.GetLogin(), in.GetPassword()
 	ctx, cancel := global.NewDBContext(5 * time.Second)
 	defer cancel()
@@ -42,6 +50,7 @@ func (authServer) Login(_ context.Context, in *proto.LoginRequest) (*proto.AuthR
 }
 
 func (server authServer) Signup(_ context.Context, in *proto.SignupRequest) (*proto.AuthResponse, error) {
+	userCollection := getUserCollection()
 	username, email, password := in.GetUsername(), in.GetEmail(), in.GetPassword()
 	match, _ := regexp.MatchString("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", email)
 	if len(username) < 4 || len(username) > 20 || len(email) < 7 || len(email) > 35 || len(password) < 8 || len(password) > 128 || !match {
@@ -81,6 +90,7 @@ func (server authServer) Signup(_ context.Context, in *proto.SignupRequest) (*pr
 }
 
 func (authServer) UsernameUsed(_ context.Context, in *proto.UsernameUsedRequest) (*proto.UsedResponse, error) {
+	userCollection := getUserCollection()
 	username := in.GetUsername()
 	ctx, cancel := global.NewDBContext(5 * time.Second)
 	defer cancel()
@@ -90,6 +100,7 @@ func (authServer) UsernameUsed(_ context.Context, in *proto.UsernameUsedRequest)
 }
 
 func (authServer) EmailUsed(_ context.Context, in *proto.EmailUsedRequest) (*proto.UsedResponse, error) {
+	userCollection := getUserCollection()
 	email := in.GetEmail()
 	ctx, cancel := global.NewDBContext(5 * time.Second)
 	defer cancel()
@@ -105,8 +116,6 @@ func (authServer) AuthUser(_ context.Context, in *proto.AuthUserRequest) (*proto
 }
 
 func main() {
-	userCollection = *global.DB.Collection("user")
-
 	server := grpc.NewServer()
 	proto.RegisterAuthServiceServer(server, authServer{})
 	listener, err := net.Listen("tcp", ":5000")
